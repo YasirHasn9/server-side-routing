@@ -8,7 +8,7 @@ route.get("/", async (req, res) => {
 });
 
 route.get("/:id", async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   if (!id) {
     return res.status(404).send({
       message: "Post Not Found"
@@ -18,5 +18,13 @@ route.get("/:id", async (req, res) => {
   res.status(200).json(post);
 });
 
+route.post("/", async (req, res) => {
+  let userInputs = req.body;
+  if (!userInputs) {
+    return res.status(500).send("There is something wrong");
+  }
+  let newPost = await db.insert(userInputs);
+  return res.status(201).json(newPost);
+});
 
 module.exports = route;
