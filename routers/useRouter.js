@@ -7,5 +7,16 @@ route.get("/", async (req, res) => {
   res.status(200).json(posts);
 });
 
+route.get("/:id", async (req, res) => {
+  const {id} = req.params;
+  if (!id) {
+    return res.status(404).send({
+      message: "Post Not Found"
+    });
+  }
+  const post = await db.findById(id);
+  res.status(200).json(post);
+});
+
 
 module.exports = route;
