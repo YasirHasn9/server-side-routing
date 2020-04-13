@@ -25,7 +25,7 @@ router.post("/", async (req, res) => {
   if (!userInputs) {
     return res.status(500).send("There is something wrong");
   }
-  //   check if the post is exists in the array
+  //   check if the post is existed in the array
   let posts = await db.find();
   for (let i = 0; i < posts.length; i++) {
     if (
@@ -40,7 +40,7 @@ router.post("/", async (req, res) => {
   return res.status(201).json(newPost);
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", async (req, res) => {
   // get the updated if
   let { title, contents } = req.body;
   // get the id
@@ -49,28 +49,14 @@ router.put("/:id", (req, res) => {
       return res
         .status(400)
         .json({ message: "Please provide title and contents for the post." });
-    } else {
-      return db
-        .update(req.params.id, req.body)
-        .then(post => res.status(201).json(post))
-        .catch(() => {
-          res.status(500).json({
-            errorMessage: "The post information could not be modified."
-          });
-        });
     }
   } else {
     return res
       .status(404)
       .json({ message: "The post with the specified ID does not exist." });
   }
-
-  // get the info title and contents and the id
-  // check if there an id
-  // we got the id then check if the title and contents been filled
-  // filled send it to to the db , NOT send an error message
-
-  // there is no id then send an Error massage
+  let updatedPost = await db.update(req.params.id, req.body);
+  return res.status(201).json(updatedPost);
 });
 
 module.exports = router;
