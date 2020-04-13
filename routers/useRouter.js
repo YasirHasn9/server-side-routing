@@ -43,20 +43,36 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   // get the updated if
   let { title, contents } = req.body;
-  // get the id
-  if (req.params.id) {
-    if (!title || !contents) {
+  try {
+    // get the id
+    if (req.params.id) {
+      if (!title || !contents) {
+        return res
+          .status(400)
+          .json({ message: "Please provide title and contents for the post." });
+      }
+    } else {
       return res
-        .status(400)
-        .json({ message: "Please provide title and contents for the post." });
+        .status(404)
+        .json({ message: "The post with the specified ID does not exist." });
     }
-  } else {
-    return res
-      .status(404)
-      .json({ message: "The post with the specified ID does not exist." });
+    let updatedPost = await db.update(req.params.id, req.body);
+    return res.status(201).json(updatedPost);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Something wrong");
   }
-  let updatedPost = await db.update(req.params.id, req.body);
-  return res.status(201).json(updatedPost);
 });
 
+router.delete("/:id", async (req, res) => {
+  try {
+    let post = await db.remove(req.params.id);
+    res.status(401).json(post);
+  } catch (err) {
+    if (!req.params.id) {
+      console.log(err);
+      return res.status(500).send("Something went wrong");
+    }
+  }
+});
 module.exports = router;
